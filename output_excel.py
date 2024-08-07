@@ -145,7 +145,7 @@ def write_chat_log(ws,chat_log: list[dict]):
 
 
 workbook, is_created = load_or_create_workbook()
-worksheet = create_worksheet("test",workbook,is_created)
+worksheet = create_worksheet("test//",workbook,is_created)
 header_formatting(worksheet)
 log = [
         {"role": "user", "content": "Hello"},
