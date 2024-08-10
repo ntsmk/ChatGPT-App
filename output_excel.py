@@ -153,19 +153,27 @@ def open_workbook():
     elif os.name == "posix":
         os.system(f"open{excel_path}")
 
-workbook, is_created = load_or_create_workbook()
-worksheet = create_worksheet("test//",workbook,is_created)
-header_formatting(worksheet)
+def output_excel(chat_log:list[dict], chat_summary:str):
+    """
+    entry point to write the chat history on chat_hitstory.xlsx
+    :param chat_log: chat history
+    :param chat_summary: chat summary
+    :return:
+    """
+
+    workbook, is_created = load_or_create_workbook()
+    worksheet = create_worksheet(chat_summary,workbook,is_created)
+    header_formatting(worksheet)
+    write_chat_log(worksheet, chat_log)
+    workbook.save(excel_path)
+    workbook.close()
+
+
 log = [
         {"role": "user", "content": "Hello"},
         {"role": "assistant", "content": "AI assistant"},
         {"role": "user", "content": "how are you?"},
         {"role": "assistant", "content": "I am fine\n tha\n nks,\nyou?\n not\n much?\n huh?\n really?\n how you doing\n these days"}
     ]
-write_chat_log(worksheet, log)
-workbook.save(excel_path)
-workbook.close()
 
-
-# new_title = trim_invalid_chars("test/\\?*[]")
-# print(new_title)
+output_excel(log,"test/\\?*")
