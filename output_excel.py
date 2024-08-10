@@ -143,6 +143,15 @@ def write_chat_log(ws,chat_log: list[dict]):
             cell_role.fill = assistant_color
             cell_content.fill = assistant_color
 
+def open_workbook():
+    """open excel file"""
+    # windows
+    if os.name == "nt":
+        os.system(f"start {excel_path}")
+
+    # mac
+    elif os.name == "posix":
+        os.system(f"open{excel_path}")
 
 workbook, is_created = load_or_create_workbook()
 worksheet = create_worksheet("test//",workbook,is_created)
@@ -155,6 +164,7 @@ log = [
     ]
 write_chat_log(worksheet, log)
 workbook.save(excel_path)
+workbook.close()
 
 
 # new_title = trim_invalid_chars("test/\\?*[]")
