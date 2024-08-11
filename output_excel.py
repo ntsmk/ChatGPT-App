@@ -25,7 +25,7 @@ def is_output_open_excel() -> bool:
         except FileNotFoundError:
             return False
     #mac
-    elif os.name == "posix":
+    if os.name == "posix":
         pass
 
 
@@ -45,11 +45,11 @@ def load_or_create_workbook() -> tuple[openpyxl.Workbook,bool]:
         wb = openpyxl.Workbook()
         return wb, True
 
-def create_worksheet (title:str,wb:openpyxl.Workbook,is_new:bool):
+def create_worksheet (title:str,target_workbook:openpyxl.Workbook,is_new:bool):
     """
 
     :param title: sheet title
-    :param wb: workbook object
+    :param target_workbook: workbook object
     :param is_new: if workbook is created new or not
     :return: worksheet object
     """
@@ -57,15 +57,15 @@ def create_worksheet (title:str,wb:openpyxl.Workbook,is_new:bool):
     trimmed_title = trim_invalid_chars(title)
     if is_new:
         # getting active sheet
-        ws = wb.active
-        ws.title = title
+        target_worksheet = target_workbook.active
+        target_worksheet.title = title
 
     else:
         # adding sheets
-        ws = wb.create_sheet(title=trimmed_title)
-        wb.move_sheet(ws,offset=-len(wb.worksheets)+1)
-        wb.active = ws
-    return ws
+        target_worksheet = target_workbook.create_sheet(title=trimmed_title)
+        target_workbook.move_sheet(target_worksheet,offset=-len(target_workbook.worksheets)+1)
+        target_workbook.active = target_worksheet
+    return target_worksheet
 
 def trim_invalid_chars(title:str) -> str:
     """
@@ -73,10 +73,11 @@ def trim_invalid_chars(title:str) -> str:
     :param title: sheet title
     :return: sheet title after removing
     """
+    new_title = title
     invalid_chars = ["/","\\","?","*","[","]"]
     for char in invalid_chars:
-        title = title.replace(char,"")
-    return title
+        new_title = new_title.replace(char,"")
+    return new_title
 
 def header_formatting(ws):
     """
