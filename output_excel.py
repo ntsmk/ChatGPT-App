@@ -79,41 +79,44 @@ def trim_invalid_chars(title:str) -> str:
         new_title = new_title.replace(char,"")
     return new_title
 
-def header_formatting(ws):
+def header_formatting(target_worksheet):
     """
     change the header of worksheet
     :param ws: worksheet to export
     :return:
     """
     # write date on A1
-    ws["A1"].value = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    ws["A1"].font = Font(name="Times New Roman")
+    datetime_cell = target_worksheet["A1"]
+    target_worksheet.value = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    target_worksheet["A1"].font = Font(name="Times New Roman")
 
     # set character on A2 and B2
-    role_header_cell = ws["A2"]
-    content_header_cell = ws["B2"]
+    role_header_cell = target_worksheet["A2"]
+    content_header_cell = target_worksheet["B2"]
 
     # set values on cell
     role_header_cell.value = "Role"
     content_header_cell.value = "Description"
 
     # set font
-    header_font_style = Font(name="Times New Roman", bold=True, color="FFFFFF")
+    white_color = "FFFFFF"
+    header_font_style = Font(name="Times New Roman", bold=True, color=white_color)
     role_header_cell.font = header_font_style
     content_header_cell.font = header_font_style
 
     # set cell color
-    header_color = PatternFill(fill_type="solid", fgColor="156B31")
+    excel_green = "156B31"
+    header_color = PatternFill(fill_type="solid", fgColor=excel_green)
     role_header_cell.fill = header_color
     content_header_cell.fill = header_color
 
     # set cell width
     # ws.columns.dimensions["A"].width = 22
     # ws.columns.dimensions["B"].width = 168
-    ws.column_dimensions["A"].width = 22
-    ws.column_dimensions["B"].width = 165
+    target_worksheet.column_dimensions["A"].width = 22
+    target_worksheet.column_dimensions["B"].width = 165
 
-def write_chat_log(ws,chat_log: list[dict]):
+def write_chat_log(target_worksheet,chat_log: list[dict]):
     """
     set the format for the chat history
     :param ws: worksheet to export
@@ -121,10 +124,12 @@ def write_chat_log(ws,chat_log: list[dict]):
     """
     row_height_adjustment_standard = 18
     font_style = Font(name="Times New Roman", size=10)
+    light_gray = "d9d9d9"
     assistant_color = PatternFill(fill_type="solid",fgColor="d9d9d9")
 
+    write_start_low = 3
     for row_number, content in enumerate(chat_log, 3):
-        cell_role, cell_content = ws[f"A{row_number}"], ws[f"B{row_number}"]
+        cell_role, cell_content = target_worksheet[f"A{row_number}"], target_worksheet[f"B{row_number}"]
 
         # write down on the cell
         cell_role.value = content["role"]
@@ -135,7 +140,7 @@ def write_chat_log(ws,chat_log: list[dict]):
 
         # adjust culum height
         adjusted_row_height = len(content["content"].split("\n"))*row_height_adjustment_standard
-        ws.row_dimensions[row_number].height = adjusted_row_height
+        target_worksheet.row_dimensions[row_number].height = adjusted_row_height
 
         # setting format
         cell_role.font = font_style
@@ -151,7 +156,7 @@ def open_workbook():
         os.system(f"start {excel_path}")
 
     # mac
-    elif os.name == "posix":
+    if os.name == "posix":
         os.system(f"open{excel_path}")
 
 def output_excel(chat_log:list[dict], chat_summary:str):
@@ -164,8 +169,8 @@ def output_excel(chat_log:list[dict], chat_summary:str):
 
     workbook, is_created = load_or_create_workbook()
     worksheet = create_worksheet(chat_summary,workbook,is_created)
-    header_formatting(worksheet)
-    write_chat_log(worksheet, chat_log)
+    header_formatting(target_worksheet=worksheet)
+    write_chat_log(target_worksheet=worksheet, chat_log=chat_log)
     workbook.save(excel_path)
     workbook.close()
 
