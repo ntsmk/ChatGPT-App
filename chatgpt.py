@@ -24,6 +24,18 @@ def give_role_to_system() -> str:
 
     return system_role
 
+def input_user_prompt()->str:
+    """
+    enter the user prompt
+    :return: user prompt
+    """
+    user_prompt = ""
+    while not user_prompt:
+        user_prompt = input("\n you:")
+        if not user_prompt:
+            print("please enter the prompt")
+    return user_prompt
+
 def generate_chat_log(gpt_model:str) -> list[dict]:
 
     # the list to save chat log
@@ -35,7 +47,7 @@ def generate_chat_log(gpt_model:str) -> list[dict]:
         chat_log.append({"role":"system","content":system_role})
 
     while True:
-        prompt = input("\nYou:")
+        prompt = input_user_prompt()
         if prompt == exit_command:
             break
 
@@ -172,6 +184,9 @@ def chat_runner() -> tuple[list[dict],str]:
     # getting chatlog
     generate_log = generate_chat_log(choise)
 
+    if not generate_log:
+        exit()
+
     # getting user's initial prompt
     initial_user_prompt = get_initial_prompt(generate_log)
 
@@ -187,3 +202,6 @@ if not is_excel_open:
     chat_runner()
 else:
     print("could not start the chat because the excel is open")
+
+if __name__ == "__main__" :
+    chat_runner()
