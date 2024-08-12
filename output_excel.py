@@ -174,12 +174,13 @@ def output_excel(chat_log:list[dict], chat_summary:str):
     workbook.save(excel_path)
     workbook.close()
 
+if __name__ == "__main__":
+    log = [
+            {"role": "user", "content": "Hello"},
+         {"role": "assistant", "content": "AI assistant"},
+         {"role": "user", "content": "how are you?"},
+         {"role": "assistant", "content": "I am fine\n tha\n nks,\nyou?\n not\n much?\n huh?\n really?\n how you doing\n these days"}
+        ]
+    output_excel(log,"test/\\?*")
 
-log = [
-        {"role": "user", "content": "Hello"},
-        {"role": "assistant", "content": "AI assistant"},
-        {"role": "user", "content": "how are you?"},
-        {"role": "assistant", "content": "I am fine\n tha\n nks,\nyou?\n not\n much?\n huh?\n really?\n how you doing\n these days"}
-    ]
-
-output_excel(log,"test/\\?*")
+print(__name__)
