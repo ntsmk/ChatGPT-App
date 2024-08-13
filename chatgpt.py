@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 import httpx
+from colorama import Fore
 
 
 exit_command = "exit()"
@@ -34,7 +35,7 @@ def input_user_prompt()->str:
     """
     user_prompt = ""
     while not user_prompt:
-        user_prompt = input("\n you:")
+        user_prompt = input(f"{Fore.CYAN}\n you:{Fore.RESET}")
         if not user_prompt:
             print("please enter the prompt")
     return user_prompt
@@ -71,7 +72,7 @@ def stream_and_concatenate_response(response) -> tuple[str, str]:
     :param response: OpenAI.chat.completions.create()
     :return: AI response and role
     """
-    print("\nAI:", end="")
+    print(f"{Fore.GREEN}\nAI:{Fore.RESET}", end="")
     content_list: list[str] = []
     role = ""
     for chunk in response:
@@ -88,6 +89,14 @@ def stream_and_concatenate_response(response) -> tuple[str, str]:
 
     return role, content
 
+def print_error_message(message:str):
+    """
+    show the error message
+    :param message:
+    :return:
+    """
+    print(f"{Fore.RED}{message}{Fore.RESET}")
+
 def fetch_gpt_model_list()->list[str]|None:
     """
     getting list of GPT model
@@ -95,22 +104,22 @@ def fetch_gpt_model_list()->list[str]|None:
     """
     # getting all list
     try:
-        # all_model_list = client.models.list()
+        all_model_list = client.models.list()
         response = httpx.Response(500,request=httpx.Request("GET","test"))
-        raise openai.RateLimitError(message="test",body="test",response=response)
+        #raise openai.RateLimitError(message="test",body="test",response=response)
 
     except openai.APIError:
-        print("API error happened")
+        print_error_message("API error occurred")
 
     else:
-        # getting only gpt model
-        # gpt_model_list = []
-        # for model in all_model_list:
-        #     if "gpt" in model.id:
-        #         gpt_model_list.append(model.id)
+        #getting only gpt model
+        gpt_model_list = []
+        for model in all_model_list:
+            if "gpt" in model.id:
+                gpt_model_list.append(model.id)
 
-    # gpt_model_list.sort()
-         return gpt_model_list
+    gpt_model_list.sort()
+    return gpt_model_list
 
 def choise_model(gpt_model_list:list[str]) -> str:
     """
@@ -137,11 +146,11 @@ def choise_model(gpt_model_list:list[str]) -> str:
 
         # case not numbers entered
         if not input_number.isdigit():
-            print("enter numbers")
+            print(f"{Fore.RED}enter numbers{Fore.RESET}")
 
         # case not numbers for the model list
         elif not int(input_number) in range(len(gpt_model_list)):
-            print("the number does not exist in the list")
+            print(f"{Fore.RED}the number does not exist in the list{Fore.RESET}")
 
         # case correct numbers entered
         else:
