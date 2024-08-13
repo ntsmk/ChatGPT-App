@@ -1,7 +1,10 @@
+import openai
+
 import output_excel
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+import httpx
 
 
 exit_command = "exit()"
@@ -85,23 +88,29 @@ def stream_and_concatenate_response(response) -> tuple[str, str]:
 
     return role, content
 
-def fetch_gpt_model_list():
+def fetch_gpt_model_list()->list[str]|None:
     """
     getting list of GPT model
     :return: GPT model list
     """
     # getting all list
-    all_model_list = client.models.list()
+    try:
+        # all_model_list = client.models.list()
+        response = httpx.Response(500,request=httpx.Request("GET","test"))
+        raise openai.RateLimitError(message="test",body="test",response=response)
 
-    # getting only gpt model
-    gpt_model_list = []
-    for model in all_model_list:
-        if "gpt" in model.id:
-            gpt_model_list.append(model.id)
+    except openai.APIError:
+        print("API error happened")
 
-    gpt_model_list.sort()
+    else:
+        # getting only gpt model
+        # gpt_model_list = []
+        # for model in all_model_list:
+        #     if "gpt" in model.id:
+        #         gpt_model_list.append(model.id)
 
-    return gpt_model_list
+    # gpt_model_list.sort()
+         return gpt_model_list
 
 def choise_model(gpt_model_list:list[str]) -> str:
     """
@@ -177,6 +186,10 @@ def chat_runner() -> tuple[list[dict],str]:
 
     # getting all gpt model
     gpt_models = fetch_gpt_model_list()
+
+    # if you did not get gpt model list, exit
+    if not gpt_models:
+        exit()
 
     # choosing the model to use in the chat
     choise = choise_model(gpt_models)
